@@ -1,7 +1,7 @@
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
-import cv4
+import cv2
 
 #Sets up the camera to be read
 camera = PiCamera()
