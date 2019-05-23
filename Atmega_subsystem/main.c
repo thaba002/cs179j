@@ -1,6 +1,7 @@
 
 
 #include <avr/io.h>
+#include "USART.h"
 //state machine states
 #define IDLE 0
 #define FORWARD 1
@@ -11,7 +12,6 @@
 #define BAUD 9600
 #define MYUBRR FOSC/16/BAUD-1
 
-unsigned char speed;
 /*
 void USART_Init(unsigned int ubrr){
 	UBRR0H = (unsigned char)(ubrr>>8);
@@ -47,6 +47,23 @@ unsigned int USART_Recieve(void){
 
 */
 
+unsigned char set_speed(unsigned char speed_input, unsigned char curr_speed){
+	unsigned char speed;
+	if(speed_input == 0x10){
+		speed = 1;
+	}
+	else if(speed_input == 0x20){
+		speed = 2;
+	}
+	else if(speed_input == 0x40){
+		speed = 3;
+	}
+	else{
+		speed = curr_speed;
+	}
+	return speed;
+}
+
 int main(void)
 {
 	//Setup I/O
@@ -61,10 +78,14 @@ int main(void)
 	
     unsigned char state = IDLE;
 	unsigned char ctrl_in = 0;
-	speed = 1;
+	unsigned char speed_cnt = 0;
+	unsigned char speed_input = 0;
+	unsigned char speed = 3;
     while (1) 
     {
 		ctrl_in = PINC & 0x0F;
+		speed_input = PINC & 0xF0;
+		speed = set_speed(speed_input, speed);
 		switch(state){
 			case IDLE: 
 				//state actions
@@ -89,8 +110,24 @@ int main(void)
 				break;
 			case FORWARD:
 				//state actions
-				PORTA = 0xFF;
-				PORTB = 0xFF;
+				if(speed == 1){
+					if(speed_cnt == 0){
+						speed_cnt++;
+					}
+					else{
+						PORTA = ~PORTA;
+						PORTB = ~PORTB;
+						speed_cnt = 0x00;
+					}
+				}
+				else if(speed == 2){
+					PORTA = ~PORTA;
+					PORTB = ~PORTB;
+				}
+				else{
+					PORTA = 0xFF;
+					PORTB = 0xFF;
+				}
 				//state logic
 				if(ctrl_in == 0x01){
 					state = IDLE;
@@ -110,8 +147,24 @@ int main(void)
 				break;
 			case LEFT:
 				//state actions
-				PORTA = 0x00;
-				PORTB = 0xFF;
+				if(speed == 1){
+					if(speed_cnt == 0){
+						speed_cnt++;
+					}
+					else{
+						PORTA = 0x00;
+						PORTB = ~PORTB;
+						speed_cnt = 0x00;
+					}
+				}
+				else if(speed == 2){
+					PORTA = 0x00;
+					PORTB = ~PORTB;
+				}
+				else{
+					PORTA = 0x00;
+					PORTB = 0xFF;
+				}
 				//state logic
 				if(ctrl_in == 0x01 || ctrl_in == 0x00){
 					state = IDLE;
@@ -131,8 +184,24 @@ int main(void)
 				break;
 			case RIGHT:
 				//state actions
-				PORTA = 0xFF;
-				PORTB = 0x00;
+				if(speed == 1){
+					if(speed_cnt == 0){
+						speed_cnt++;
+					}
+					else{
+						PORTA = ~PORTA;
+						PORTB = 0x00;
+						speed_cnt = 0x00;
+					}
+				}
+				else if(speed == 2){
+					PORTA = ~PORTA;
+					PORTB = 0x00;
+				}
+				else{
+					PORTA = 0xFF;
+					PORTB = 0x00;
+				}
 				//state logic
 				if(ctrl_in == 0x01 || ctrl_in == 0x00){
 					state = IDLE;
