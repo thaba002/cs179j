@@ -27,18 +27,29 @@ def Threshold(image):
 
 def Histogram(image):
 	array = np.empty(maxWidth)
-	
-	for i in range(maxWidth): #iterates through the width of the image
-		ROILane = cv2.rectangle(image, (i,280),(i+1,maxWidth), (255,0,0),thickness=2)
-		ROILane = cv2.divide(ROILane, 255)
-		array[i] = np.int32(np.sum(ROILane))
+	ROILane = image[280:maxHeight, 0:maxWidth]
+	#cv2.imshow("ROILANE", ROILane)    #use this to check ROI
+	for i in range(maxWidth):
+		array[i] = np.int32(np.sum(ROILane[:,i]))
 	return array
-	
-def LaneFinder(array):
-	#LeftPtr = 120;
-	#for LeftPtr in range(array):
-		
 
+def LaneFinder(array, image):
+	#Here is where we scan both sides of the image(array) to find lane lines based on the histagram made earlier
+	LeftPtr = 0
+	RightPtr = 320
+	for i in range(320):
+		if (array[i] >= array[LeftPtr]): 
+			LeftPtr = i
+	
+	j = 320;
+	for j in range(640):
+		if (array[j] >= array[RightPtr]): 
+			RightPtr = j
+	
+	cv2.line(image, (LeftPtr, 0), (LeftPtr,480),(0,0,255), 3)
+	cv2.line(image, (RightPtr, 0), (RightPtr, 480), (0,0,255), 3)
+	cv2.imshow("", image)
+	
 Points = [(190, 160),(460, 160),(10, 360),(626, 360)] #points used for region of interest
 Destination = [(120,0),(520,0),(120,480),(520,480)] #points used for top perspective
 
@@ -46,9 +57,10 @@ image = cv2.imread('image.jpg')
 warped = Perspective(image, Points, Destination)
 threshold = Threshold(warped)
 array = Histogram(threshold)
-print(array)
-cv2.imshow("Box", image)
-cv2.imshow("Perspective", warped)
-cv2.imshow("Final", threshold)
+LaneFinder(array, threshold)
+#print(array)
+#cv2.imshow("Box", array)
+#cv2.imshow("Perspective", warped)
+#cv2.imshow("Final", threshold)
 cv2.waitKey(0)
 
