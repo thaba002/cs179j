@@ -1,6 +1,8 @@
 import numpy as np
 import time
 import cv2
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 
 maxHeight = 480 #change these later
 maxWidth = 640
@@ -57,22 +59,34 @@ def LaneFinder(array, image):
 	#creating the center line and the frame center, goal is to keep these close
 	cv2.line(image, (laneCenter, 0), (laneCenter, 480), (0,255,0), 3)
 	cv2.line(image, (frameCenter, 0), (frameCenter, 480), (255,255,0), 3)
-	cv2.imshow("", image)
-
-
 	
+	result = laneCenter - frameCenter
 	
+	return image, result
+
+camera = PiCamera()
+camera.resolution = (640,480)
+camera.framerate = 32
+rawCap = PiRGBArray(camera, size=(640, 480))
+
+time.sleep(0.1) #let it warm up
+
 Points = [(190, 160),(460, 160),(10, 360),(626, 360)] #points used for region of interest
 Destination = [(120,0),(520,0),(120,480),(520,480)] #points used for top perspective
 
-image = cv2.imread('image.jpg')
-warped = Perspective(image, Points, Destination)
-threshold = Threshold(warped)
-array = Histogram(threshold)
-LaneFinder(array, threshold)
-#print(array)
-#cv2.imshow("Box", array)
-#cv2.imshow("Perspective", warped)
-#cv2.imshow("Final", threshold)
-cv2.waitKey(0)
+for frame in camera.capture_continuous(rawCap, format="bgr", use_video_port=True):
+	image = frame.array
+	warped = Perspective(image, Points, Destination)
+	threshold = Threshold(warped)
+	array = Histogram(threshold) #returns a histogram of intensities in our ROI
+	lanes, result = LaneFinder(array, threshold) #returns the image with lane lines and the result to drive with
+	cv2.imshow("Box",lanes)
+	#cv2.imshow("Perspective", warped)
+	#cv2.imshow("Final", threshold)
+	key = cv2.waitKey(1) & 0xFF
+	
+	rawCap.truncate(0)
+	
+	if key == ord("q"):
+		break
 
