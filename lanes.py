@@ -63,7 +63,28 @@ def LaneFinder(array, image):
 	result = laneCenter - frameCenter
 	
 	return image, result
-
+	
+def drive(result):
+	if (!result):
+		#do nothing
+	else if (result > 0 && result < 10):
+		#turn right slightly
+	else if (result > 10 && result < 20):
+		#turn right harder
+	else if (result > 20):
+		#turn right hardest
+	else if (result < 0 && result > -10):
+		#turn left slightly
+	else if (result < -10 && result > -20):
+		#turn left harder
+	else if (result < -20):
+		#turn left hardest
+		
+		
+		
+		
+		
+		
 camera = PiCamera()
 camera.resolution = (640,480)
 camera.framerate = 32
@@ -83,6 +104,7 @@ for frame in camera.capture_continuous(rawCap, format="bgr", use_video_port=True
 	array = Histogram(threshold) #returns a histogram of intensities in our ROI
 	lanes, result = LaneFinder(array, threshold) #returns the image with lane lines and the result to drive with
 	cv2.imshow("Box",lanes)
+	drive(result) #sends output to atmega
 	#cv2.imshow("Perspective", warped)
 	#cv2.imshow("Final", threshold)
 	
