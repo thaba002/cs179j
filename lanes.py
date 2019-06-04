@@ -21,7 +21,7 @@ def Perspective(image, image_Points, des_Points):
 	
 def Threshold(image):
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-	gray_threshold = cv2.inRange(gray, 2,28)
+	gray_threshold = cv2.inRange(gray, 2,28) #play with these till noise is mostly removed in image
 	canny = cv2.Canny(gray_threshold, 500, 700)
 	final = cv2.add(canny, gray_threshold)
 	final = cv2.cvtColor(final, cv2.COLOR_GRAY2RGB)
@@ -76,6 +76,8 @@ Destination = [(120,0),(520,0),(120,480),(520,480)] #points used for top perspec
 
 for frame in camera.capture_continuous(rawCap, format="bgr", use_video_port=True):
 	image = frame.array
+	
+	
 	warped = Perspective(image, Points, Destination)
 	threshold = Threshold(warped)
 	array = Histogram(threshold) #returns a histogram of intensities in our ROI
@@ -83,8 +85,17 @@ for frame in camera.capture_continuous(rawCap, format="bgr", use_video_port=True
 	cv2.imshow("Box",lanes)
 	#cv2.imshow("Perspective", warped)
 	#cv2.imshow("Final", threshold)
-	key = cv2.waitKey(1) & 0xFF
 	
+	
+	#if result > 0 turn right
+	#if result > 10 turn right harder
+	#if result < 0 turn left
+	#if result < -10 turn left harder
+	
+	
+	
+	key = cv2.waitKey(1) & 0xFF
+
 	rawCap.truncate(0)
 	
 	if key == ord("q"):
