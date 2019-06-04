@@ -35,20 +35,32 @@ def Histogram(image):
 
 def LaneFinder(array, image):
 	#Here is where we scan both sides of the image(array) to find lane lines based on the histagram made earlier
+	LeftArray = array[0:320]
+	RightArray = array[320:640]
 	LeftPtr = 0
-	RightPtr = 320
+	RightPtr = 0
 	for i in range(320):
-		if (array[i] >= array[LeftPtr]): 
+		if (LeftArray[i] >= LeftArray[LeftPtr]): 
 			LeftPtr = i
 	
-	j = 320;
-	for j in range(640):
-		if (array[j] >= array[RightPtr]): 
+	
+	for j in range(320):
+		if (RightArray[j] > RightArray[RightPtr]): 
 			RightPtr = j
 	
+	RightPtr = RightPtr + 320
 	cv2.line(image, (LeftPtr, 0), (LeftPtr,480),(0,0,255), 3)
 	cv2.line(image, (RightPtr, 0), (RightPtr, 480), (0,0,255), 3)
+	laneCenter = (RightPtr - LeftPtr) / 2 + LeftPtr
+	frameCenter = maxWidth / 2 #change this based on where you put down the RC Car
+	
+	#creating the center line and the frame center, goal is to keep these close
+	cv2.line(image, (laneCenter, 0), (laneCenter, 480), (0,255,0), 3)
+	cv2.line(image, (frameCenter, 0), (frameCenter, 480), (255,255,0), 3)
 	cv2.imshow("", image)
+
+
+	
 	
 Points = [(190, 160),(460, 160),(10, 360),(626, 360)] #points used for region of interest
 Destination = [(120,0),(520,0),(120,480),(520,480)] #points used for top perspective
