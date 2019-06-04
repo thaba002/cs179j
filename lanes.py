@@ -19,7 +19,7 @@ def Perspective(image, image_Points, des_Points):
 	
 def Threshold(image):
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-	gray_threshold = cv2.inRange(gray, 5,28)
+	gray_threshold = cv2.inRange(gray, 2,28)
 	canny = cv2.Canny(gray_threshold, 500, 700)
 	final = cv2.add(canny, gray_threshold)
 	final = cv2.cvtColor(final, cv2.COLOR_GRAY2RGB)
@@ -32,10 +32,11 @@ def Histogram(image):
 		ROILane = cv2.rectangle(image, (i,280),(i+1,maxWidth), (255,0,0),thickness=2)
 		ROILane = cv2.divide(ROILane, 255)
 		array[i] = np.int32(np.sum(ROILane))
-		return array
+	return array
 	
 def LaneFinder(array):
-	LeftPtr = np.where(array == np.amax(array))
+	#LeftPtr = 120;
+	#for LeftPtr in range(array):
 		
 
 Points = [(190, 160),(460, 160),(10, 360),(626, 360)] #points used for region of interest
@@ -45,6 +46,7 @@ image = cv2.imread('image.jpg')
 warped = Perspective(image, Points, Destination)
 threshold = Threshold(warped)
 array = Histogram(threshold)
+print(array)
 cv2.imshow("Box", image)
 cv2.imshow("Perspective", warped)
 cv2.imshow("Final", threshold)
