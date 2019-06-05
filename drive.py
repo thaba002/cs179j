@@ -78,3 +78,5 @@ for frame in camera.capture_continuous(rawCap, format="bgr", use_video_port=True
 	
 	if key == ord("q"):
 		break
+
+GPIO.cleanup() #reset the pins at the end of the program
