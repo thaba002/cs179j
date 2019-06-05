@@ -64,62 +64,17 @@ def LaneFinder(array, image):
 	
 	return image, result
 	
-def drive(result):
-	if (!result):
-		#do nothing
-	else if (result > 0 && result < 10):
-		#turn right slightly
-	else if (result > 10 && result < 20):
-		#turn right harder
-	else if (result > 20):
-		#turn right hardest
-	else if (result < 0 && result > -10):
-		#turn left slightly
-	else if (result < -10 && result > -20):
-		#turn left harder
-	else if (result < -20):
-		#turn left hardest
 		
-		
-		
-		
-		
-		
-camera = PiCamera()
-camera.resolution = (640,480)
-camera.framerate = 32
-rawCap = PiRGBArray(camera, size=(640, 480))
+def LaneAssist(image):
+	Points = [(190, 160),(460, 160),(10, 360),(626, 360)] #points used for region of interest
+	Destination = [(120,0),(520,0),(120,480),(520,480)] #points used for top perspective
 
-time.sleep(0.1) #let it warm up
-
-Points = [(190, 160),(460, 160),(10, 360),(626, 360)] #points used for region of interest
-Destination = [(120,0),(520,0),(120,480),(520,480)] #points used for top perspective
-
-for frame in camera.capture_continuous(rawCap, format="bgr", use_video_port=True):
-	image = frame.array
-	
-	
 	warped = Perspective(image, Points, Destination)
 	threshold = Threshold(warped)
 	array = Histogram(threshold) #returns a histogram of intensities in our ROI
 	lanes, result = LaneFinder(array, threshold) #returns the image with lane lines and the result to drive with
-	cv2.imshow("Box",lanes)
-	drive(result) #sends output to atmega
-	#cv2.imshow("Perspective", warped)
-	#cv2.imshow("Final", threshold)
+	return warped, lanes, result;
 	
+		
 	
-	#if result > 0 turn right
-	#if result > 10 turn right harder
-	#if result < 0 turn left
-	#if result < -10 turn left harder
-	
-	
-	
-	key = cv2.waitKey(1) & 0xFF
-
-	rawCap.truncate(0)
-	
-	if key == ord("q"):
-		break
 
