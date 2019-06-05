@@ -3,6 +3,7 @@ import time
 import cv2
 from picamera.array import PiRGBArray
 from picamera import PiCamera
+import RPi.GPIO as GPIO
 from lanes import *
 
 maxHeight = 480 #change these later
@@ -10,22 +11,34 @@ maxWidth = 640
 
 def steerLanes(result):
 	if (result == 0):
-		#do nothing
+		GPIO.output(21, False) #value = 0000
+		GPIO.output(22, False)
+		GPIO.output(23, False)
+		GPIO.output(24, False)
 		print("nothing")
 	elif (result > 0 and result < 10):
-		#turn right slightly
+		GPIO.output(21, True)	#value = 0001 = 1
+		GPIO.output(22, False)
+		GPIO.output(23, False)
+		GPIO.output(24, False)
 		print("R1")
-	elif (result > 10 and result < 20):
-		#turn right harder
+	elif (result > 10):
+		GPIO.output(21, False)  #value = 0010 = 2
+		GPIO.output(22, True)
+		GPIO.output(23, False)
+		GPIO.output(24, False)
 		print("R2")
-	elif (result > 20):
-		#turn right hardest
-		print("R3")
 	elif (result < 0 and result > -10):
-		#turn left slightly
+		GPIO.output(21, True) #value = 0011 = 3
+		GPIO.output(22, True)
+		GPIO.output(23, False)
+		GPIO.output(24, False)
 		print("L1")
-	elif (result < -10 and result > -20):
-		#turn left harder
+	elif (result < -10):
+		GPIO.output(21, False) #value = 0100 = 4
+		GPIO.output(22, False)
+		GPIO.output(23, True)
+		GPIO.output(24, False)
 		print("L2")
 	elif (result < -20):
 		#turn left hardest
@@ -38,6 +51,12 @@ camera.framerate = 32
 rawCap = PiRGBArray(camera, size=(maxWidth, maxHeight))
 
 time.sleep(0.1) #let it warm up
+
+GPIO.setmode(GPIO.BOARD) #SETUP THE GPIO PINS
+GPIO.setup(21,GPIO.OUT) 
+GPIO.setup(22,GPIO.OUT)
+GPIO.setup(23,GPIO.OUT)
+GPIO.setup(24,GPIO.OUT)
 
 for frame in camera.capture_continuous(rawCap, format="bgr", use_video_port=True):
 	image = frame.array
