@@ -49,14 +49,12 @@ while success:
                 print("Go")
             elif dominant_color[0] < 150 and dominant_color[1] > 150 and dominant_color[2] > 150:
                 print("Slow")
-            elif dominant_color[0] < 100 and dominant_color[1]  < 100 and dominant_color[2] < 100:
-                print("SPEED_1")
             else:
                 print("N/A")
 
         for i in circles[0, :]:
-            cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
-            cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
+            cv2.circle(frame, (i[0], i[1]), i[2], (255,0 , 0), 2)
+            cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 0), 3)
     cv2.imshow('camera', frame)
 
 
