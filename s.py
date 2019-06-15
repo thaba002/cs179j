@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from scipy.stats import itemfreq
 
+#codse based on code found here https://onedrive.live.com/?authkey=%21AA_r_7gtr5cqWFE&cid=2AAE05B692B45603&id=2AAE05B692B45603%21251895&parId=2AAE05B692B45603%21139667&o=OneUp
 
 def get_dominant_color(img, n_colors):
     pixels = np.float32(img).reshape((-1, 3))
@@ -42,19 +43,20 @@ while success:
 
             dominant_color = get_dominant_color(square, 2)
             print(dominant_color)
-            if dominant_color[2] > 200 and dominant_color[1] < 160 and dominant_color[0]< 120:
+            if dominant_color[2] > 200 and dominant_color[1] < 100 and dominant_color[0] < 100:
                 print("STOP")
-            elif dominant_color[1] > 140 and dominant_color[2] < 150:
+            elif dominant_color[1] > 150 and dominant_color[2] < 150 and dominant_color[0] < 150:
                 print("Go")
-            elif dominant_color[0] >100 and dominant_color[1] > 150 and dominant_color[2] > 150:
+            elif dominant_color[0] < 150 and dominant_color[1] > 150 and dominant_color[2] > 150:
                 print("Slow")
-            
+            elif dominant_color[0] < 100 and dominant_color[1]  < 100 and dominant_color[2] < 100:
+                print("SPEED_1")
             else:
                 print("N/A")
 
         for i in circles[0, :]:
-            cv2.circle(frame, (i[0], i[1]), i[2], (255, 0, 0), 2)
-            cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 0), 3)
+            cv2.circle(frame, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            cv2.circle(frame, (i[0], i[1]), 2, (0, 0, 255), 3)
     cv2.imshow('camera', frame)
 
 
